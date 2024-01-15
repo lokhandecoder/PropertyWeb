@@ -7,6 +7,9 @@ import DeleteConfirmationDialog from "../Components/Fixed/DeleteConfirmationDial
 import { API_URL, Loginperson } from "../API_CONFIG";
 import { toast } from "react-toastify";
 import { AddYourWishList } from "../Services/WishListServices";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 export interface Property {
   contactPerson: string;
   description: string;
@@ -23,6 +26,7 @@ export interface Property {
 function BuyPage() {
   const navigate = useNavigate();
   const [Data, setData] = useState<Property[]>([]);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [locationFilter, setLocationFilter] = useState<string | null>(null);
@@ -36,11 +40,18 @@ function BuyPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
   const handleNextPhoto = () => {
+    setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % Data[currentPhotoIndex].photos.length);
+  };
+  
+  const handlePrevPhoto = () => {
     setCurrentPhotoIndex(
-      (prevIndex) => (prevIndex + 1) % Data[currentPhotoIndex].photos.length
+      (prevIndex) =>
+        (prevIndex - 1 + Data[currentPhotoIndex].photos.length) % Data[currentPhotoIndex].photos.length
     );
   };
+
   const filteredData = Data.filter((property) => {
     return (
       (!typeFilter || property.type === typeFilter) &&
@@ -96,16 +107,17 @@ function BuyPage() {
       try {
         const hitData = await AddYourWishList(sendData);
         console.log("Added", hitData);
+        setIsFavorite(!isFavorite);
       } catch (error) {
         console.error(error);
       }
       // alert(JSON.stringify(sendData));
     }
   };
-  const maskPhoneNumber = (phoneNumber : string) => {
+  const maskPhoneNumber = (phoneNumber: string) => {
     const maskedNumber =
       phoneNumber.length > 4
-        ? '*'.repeat(phoneNumber.length - 4) + phoneNumber.slice(-4)
+        ? "*".repeat(phoneNumber.length - 4) + phoneNumber.slice(-4)
         : phoneNumber;
     return maskedNumber;
   };
@@ -124,13 +136,12 @@ function BuyPage() {
 
           {filteredData.map((data, index) => (
             <div
-              className="md:flex bg-white rounded-xl shadow-md  justify-evenly"
+              className="grid grid-cols-2 gap-4 bg-white rounded-xl shadow-md"
               key={index}
             >
-              {/* Property Photos */}
-              <div className="md:flex-shrink-0 relative">
+              <div className="relative" style={{ height: "400px" }}>
                 <img
-                  className="h-48 w-full object-fit md:w-100"
+                  className="w-full h-full object-cover"
                   src={
                     data.photos && data.photos.length > 0
                       ? `${API_URL}property${data.photos[currentPhotoIndex]}`
@@ -140,66 +151,73 @@ function BuyPage() {
                 />
 
                 {data.photos.length > 1 && (
-                  <button className="m-4" onClick={handleNextPhoto}>
-                    Next
-                  </button>
+                  <>
+                    <button className="m-4" onClick={handlePrevPhoto}>
+                      Prev
+                    </button>
+                    <button className="m-4" onClick={handleNextPhoto}>
+                      Next
+                    </button>
+                  </>
                 )}
               </div>
 
-              {/* Property Details */}
-              <div className="p-8">
-                <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-                  {data.type}
-                </div>
-                <a
-                  href="#"
-                  className="block mt-1 text-lg leading-tight font-medium text-black hover:underline"
-                >
-                  {data.title}
-                </a>
-                <p className="mt-2 text-gray-500">{data.description}</p>
-                <div className="mt-4">
-                  <span className="text-gray-700">Location:</span>{" "}
-                  {data.location}
-                </div>
-                <div className="mt-2">
-                  <span className="text-gray-700">Contact Person:</span>{" "}
-                  {person.id === 0
-                    ? maskPhoneNumber(data.contactPerson)
-                    : data.contactPerson}
-                </div>
-                <div className="mt-2">
-                  <span className="text-gray-700">Price:</span> Rs.
-                  {data.price}
-                </div>
-                <div className="mt-2">
-                  <span className="text-gray-700">Square Footage:</span>{" "}
-                  {data.squareFootage} sq.ft
-                </div>
-                {person.id === data.userId && (
-                  <div className=" mt-4">
-                    <button
-                      className="bg-yellow-200 p-2 "
-                      onClick={() => handleEdit(data.id)}
-                    >
-                      Edit
+              <div className="">
+                <div className="p-8">
+                  {person.id === data.userId ? (
+                    <div className="flex justify-end">
+                    <button className="p-2" onClick={() => handleEdit(data.id)}>
+                      <EditIcon className="mr-2" style={{ fontSize: '32px' }} />
                     </button>
-                    <button
-                      className="bg-red-200 p-2 ml-2"
-                      onClick={() => handleDelete(data.id)}
-                    >
-                      Delete
+                    <button className="p-2 ml-2" onClick={() => handleDelete(data.id)}>
+                      <DeleteIcon className="mr-2" style={{ fontSize: '32px' }} />
                     </button>
                   </div>
-                )}
-                {person.id !== data.userId && (
-                  <button
-                    className="bg-yellow-200 p-2 "
-                    onClick={() => handleWishList(data.id)}
+                  ) : (
+                    <div className="flex justify-end">
+                      <button
+                        className="p-2"
+                        onClick={() => handleWishList(data.id)}
+                      >
+                        <FavoriteIcon
+                          className="mr-2"
+                          style={{
+                            color: isFavorite ? "red" : "black",
+                            fontSize: "32px",
+                          }}
+                        />
+                      </button>
+                    </div>
+                  )}
+                  <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+                    {data.type}
+                  </div>
+                  <a
+                    href="#"
+                    className="block mt-1 text-lg leading-tight font-medium text-black hover:underline"
                   >
-                    WishList
-                  </button>
-                )}
+                    {data.title}
+                  </a>
+                  <p className="mt-2 text-gray-500">{data.description}</p>
+                  <div className="mt-4">
+                    <span className="text-gray-700">Location:</span>{" "}
+                    {data.location}
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-gray-700">Contact Person:</span>{" "}
+                    {person.id === 0
+                      ? maskPhoneNumber(data.contactPerson)
+                      : data.contactPerson}
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-gray-700">Price:</span> Rs.
+                    {data.price}
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-gray-700">Square Footage:</span>{" "}
+                    {data.squareFootage} sq.ft
+                  </div>
+                </div>
               </div>
             </div>
           ))}
