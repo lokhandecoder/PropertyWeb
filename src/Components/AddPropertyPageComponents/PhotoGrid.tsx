@@ -1,43 +1,30 @@
-import React, { useState, ChangeEvent, useRef } from 'react';
+// PhotoGrid.tsx
 
-export const PhotoGrid: React.FC<{ onAddPhoto: (photos: string[]) => void }> = ({ onAddPhoto }) => {
-  const [photos, setPhotos] = useState<string[]>([]);
+import React, { ChangeEvent, useRef } from "react";
+
+interface PhotoGridProps {
+  onAddPhoto: (photos: File[]) => void;
+}
+
+export const PhotoGrid: React.FC<PhotoGridProps> = ({ onAddPhoto }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAddPhoto = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedPhotos = e.target.files;
-    if (selectedPhotos) {
-      const newPhotoUrls = Array.from(selectedPhotos).map(photo =>
-        URL.createObjectURL(photo)
-      );
-      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotoUrls]);
-      onAddPhoto([...photos, ...newPhotoUrls]); // Notify the parent component about the new photos
-    }
-  };
-
-  const handleAddButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      onAddPhoto(filesArray);
     }
   };
 
   return (
-    <div className="photo-grid-container flex items-center">
-      {photos.map((photo, index) => (
-        <img key={index} src={photo} alt={`Photo ${index + 1}`} className="object-cover h-48 w-full" />
-      ))}
+    <div>
       <input
         type="file"
         accept="image/*"
         multiple
-        onChange={handleAddPhoto}
-        style={{ display: 'none' }}
         ref={fileInputRef}
-        id="photoInput"
+        onChange={handleFileChange}
       />
-      <label htmlFor="photoInput">
-        <button onClick={handleAddButtonClick}>Add Photo</button>
-      </label>
     </div>
   );
 };

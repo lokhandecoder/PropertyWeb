@@ -37,7 +37,8 @@ function LoginForm() {
         } else {
           toast.error('Failed to Login, Please try again.');
         }
-        navigate('/')
+        // navigate('/')
+        window.location.href = "/";
 
       } catch (error) {
         console.log("Err", error)

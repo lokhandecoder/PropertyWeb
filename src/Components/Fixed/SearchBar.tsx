@@ -62,3 +62,70 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFilterChange }) => {
 };
 
 export default SearchBar;
+// import React, { useState } from "react";
+// import { Property } from "../../Pages/BuyPage";
+
+
+// interface SearchBarProps {
+//   onFilterChange: (type: string | null, location: string | null) => void;
+//   data?: Property[]; // Add this line to make 'data' an optional prop
+// }
+
+// const SearchBar: React.FC<SearchBarProps> = ({ onFilterChange, data = [] }) => {
+//   const [searchInput, setSearchInput] = useState("");
+//   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+//   // Extract unique locations from the property data
+//   const locationSet = new Set(data.map((property) => property.location));
+//   const locationSuggestions = Array.from(locationSet);
+
+//   // Function to handle changes in the search input
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const inputValue = e.target.value;
+//     setSearchInput(inputValue);
+
+//     // Filter location suggestions based on the inputValue
+//     const filteredSuggestions = locationSuggestions.filter((suggestion) =>
+//       suggestion.toLowerCase().includes(inputValue.toLowerCase())
+//     );
+
+//     setSuggestions(filteredSuggestions);
+//   };
+
+//   // Function to handle suggestion selection
+//   const handleSuggestionClick = (suggestion: string) => {
+//     setSearchInput(suggestion);
+//     // Clear suggestions
+//     setSuggestions([]);
+//   };
+
+//   // Function to handle applying filters when the user presses Enter
+//   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+//     if (e.key === "Enter") {
+//       const [typeFilter, locationFilter] = searchInput.split(" ");
+//       onFilterChange(typeFilter, locationFilter);
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <input
+//         type="text"
+//         placeholder="Search by type and location..."
+//         value={searchInput}
+//         onChange={handleInputChange}
+//         onKeyPress={handleKeyPress}
+//       />
+//       <ul>
+//         {suggestions.map((suggestion, index) => (
+//           <li key={index} onClick={() => handleSuggestionClick(suggestion)}>
+//             {suggestion}
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// };
+
+// export default SearchBar;
+
